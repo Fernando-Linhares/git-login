@@ -5,7 +5,7 @@ from pathlib import Path
 
 class DataSource:
     def __init__(self):
-        self.git_login_dir = Path.home() / '.git-login'
+        self.git_login_dir = Path.home() / 'git-hyper'
         if not self.git_login_dir.exists():
             self.git_login_dir.mkdir()
 

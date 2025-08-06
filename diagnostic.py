@@ -13,7 +13,7 @@ import json
 class GitLoginDoctor:
     def __init__(self):
         self.home_dir = Path.home()
-        self.git_login_dir = self.home_dir / '.git-login'
+        self.git_login_dir = self.home_dir / '.git-hyper'
         self.ssh_dir = self.home_dir / '.ssh'
         self.issues = []
         self.warnings = []
@@ -28,13 +28,13 @@ class GitLoginDoctor:
         
         # Verificar diretório principal
         if not self.git_login_dir.exists():
-            self.issues.append("Diretório ~/.git-login não encontrado")
+            self.issues.append("Diretório ~/.git-hyper não encontrado")
             return False
         
         # Verificar estrutura de arquivos
         app_dir = self.git_login_dir / 'app'
         if not app_dir.exists():
-            self.issues.append("Diretório ~/.git-login/app não encontrado")
+            self.issues.append("Diretório ~/.git-hyper/app não encontrado")
             return False
         
         datasource_file = app_dir / 'data_source.py'

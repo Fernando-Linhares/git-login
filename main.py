@@ -8,7 +8,7 @@ from pathlib import Path
 from app.data_source import DataSource
 
 def get_key():
-    """Captura teclas do usuário"""
+    """Capture user key presses"""
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     
@@ -24,18 +24,18 @@ def get_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 def colored(text, color_code):
-    """Adiciona cores ao texto"""
+    """Add color to text"""
     return f"\033[{color_code}m{text}\033[0m"
 
 def justify_cell(text, size):
-    """Justifica texto em célula de tabela"""
+    """Justify text in a table cell"""
     if len(text) > size:
         return text[:size - 3] + '...'
     else:
         return text.center(size)
 
 def get_input(prompt):
-    """Obtém input do usuário (restaura modo normal do terminal)"""
+    """Get user input (restore normal terminal mode)"""
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
@@ -45,169 +45,167 @@ def get_input(prompt):
         pass
 
 def print_header():
-    """Imprime cabeçalho do programa"""
+    """Print program header"""
     print()
-    print(colored("  ██████╗  ██████╗ ████████╗", "91") + "  " + colored("██╗      ██████╗  ██████╗ ██╗███╗   ██╗", "96"))
-    print(colored(" ██╔════╝    ██╔═╝  ═ ██╔══╝", "91") + "  " + colored("██║     ██╔═══██╗██╔════╝ ██║████╗  ██║", "96"))
-    print(colored(" ██║  ███║   ██║      ██║   ", "91") + "  " + colored("██║     ██║   ██║██║  ███╗██║██╔██╗ ██║", "96"))
-    print(colored(" ██║   ██║   ██║      ██║   ", "91") + "  " + colored("██║     ██║   ██║██║   ██║██║██║╚██╗██║", "96"))
-    print(colored(" ╚██████╔╝ ██████║    ██║   ", "91") + "  " + colored("███████╗╚██████╔╝╚██████╔╝██║██║ ╚████║", "96"))
-    print(colored("  ╚═════╝   ╚════╝   ╚═══╝   ", "91") + "  " + colored("╚══════╝ ╚═════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝", "96"))
+    print(colored("  ██████╗ ██╗████████╗", "91") + "  " + colored("██╗  ██╗██╗   ██╗██████╗ ███████╗██████╗ ", "96"))
+    print(colored(" ██╔════╝ ██║╚══██╔══╝", "91") + "  " + colored("██║  ██║╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗", "96"))
+    print(colored(" ██║  ███╗██║   ██║   ", "91") + "  " + colored("███████║ ╚████╔╝ ██████╔╝█████╗  ██████╔╝", "96"))
+    print(colored(" ██║   ██║██║   ██║   ", "91") + "  " + colored("██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══╝  ██╔══██╗", "96"))
+    print(colored(" ╚██████╔╝██║   ██║   ", "91") + "  " + colored("██║  ██║   ██║   ██║     ███████╗██║  ██║", "96"))
+    print(colored("  ╚═════╝ ╚═╝   ╚═╝   ", "91") + "  " + colored("╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚══════╝╚═╝  ╚═╝", "96"))
     print()
 
 def add_login():
-    """Adiciona novo login"""
+    """Add new login"""
     os.system('clear')
     print_header()
-    print(colored("=== ADICIONAR NOVA CONTA ===", "93"))
+    print(colored("=== ADD NEW ACCOUNT ===", "93"))
     print()
     
     try:
-        name = get_input("Nome: ").strip()
+        name = get_input("Name: ").strip()
         if not name:
-            print(colored("Nome não pode estar vazio!", "91"))
-            get_input("Pressione Enter para continuar...")
+            print(colored("Name cannot be empty!", "91"))
+            get_input("Press Enter to continue...")
             return
         
         email = get_input("Email: ").strip()
         if not email or '@' not in email:
-            print(colored("Email inválido!", "91"))
-            get_input("Pressione Enter para continuar...")
+            print(colored("Invalid email!", "91"))
+            get_input("Press Enter to continue...")
             return
         
-        print("\nOpções para chave SSH:")
-        print("1 - Gerar nova chave SSH")
-        print("2 - Usar chave SSH existente")
+        print("\nSSH Key Options:")
+        print("1 - Generate new SSH key")
+        print("2 - Use existing SSH key")
         
-        choice = get_input("Escolha (1 ou 2): ").strip()
+        choice = get_input("Choose (1 or 2): ").strip()
         
         datasource = DataSource()
         ssh_key_path = None
         
         if choice == '1':
-            print("\nGerando nova chave SSH...")
+            print("\nGenerating new SSH key...")
             ssh_key_path = datasource.generate_ssh_key(name, email)
             if ssh_key_path:
-                print(colored(f"Chave SSH gerada: {ssh_key_path}", "92"))
+                print(colored(f"SSH Key generated: {ssh_key_path}", "92"))
                 datasource.set_default(ssh_key_path)
                 pub_key = datasource.get_public_key(ssh_key_path)
                 if pub_key:
-                    print("\n" + colored("CHAVE PÚBLICA (adicione ao GitHub):", "93"))
+                    print("\n" + colored("PUBLIC KEY (add to GitHub):", "93"))
                     print(colored(pub_key, "96"))
-                    print(colored("\nCopie a chave acima e adicione em: GitHub → Settings → SSH Keys", "93"))
+                    print(colored("\nCopy the key above and add to: GitHub → Settings → SSH Keys", "93"))
             else:
-                print(colored("Erro ao gerar chave SSH!", "91"))
-                get_input("Pressione Enter para continuar...")
+                print(colored("Error generating SSH key!", "91"))
+                get_input("Press Enter to continue...")
                 return
                 
         elif choice == '2':
-            ssh_key_path = get_input("Caminho para chave SSH privada: ").strip()
+            ssh_key_path = get_input("Path to private SSH key: ").strip()
             if not Path(ssh_key_path).exists():
-                print(colored("Arquivo de chave não encontrado!", "91"))
-                get_input("Pressione Enter para continuar...")
+                print(colored("Key file not found!", "91"))
+                get_input("Press Enter to continue...")
                 return
         else:
-            print(colored("Opção inválida!", "91"))
-            get_input("Pressione Enter para continuar...")
+            print(colored("Invalid option!", "91"))
+            get_input("Press Enter to continue...")
             return
         
-        # Criar conta
         if datasource.create_account(name, email, ssh_key_path):
-            print(colored(f"\nConta '{name}' criada e ativada com sucesso!", "92"))
-            print(colored("Configurações Git aplicadas automaticamente.", "92"))
+            print(colored(f"\nAccount '{name}' created and activated successfully!", "92"))
+            print(colored("Git settings applied automatically.", "92"))
         else:
-            print(colored("Erro: Email já cadastrado!", "91"))
+            print(colored("Error: Email already registered!", "91"))
         
         datasource.close()
-        get_input("Pressione Enter para continuar...")
+        get_input("Press Enter to continue...")
         
     except KeyboardInterrupt:
-        print(colored("\nOperação cancelada!", "93"))
+        print(colored("\nOperation cancelled!", "93"))
         return
     except Exception as e:
-        print(colored(f"Erro: {e}", "91"))
-        get_input("Pressione Enter para continuar...")
+        print(colored(f"Error: {e}", "91"))
+        get_input("Press Enter to continue...")
 
 def list_and_select_account():
-    """Lista contas e permite seleção"""
+    """List accounts and allow selection"""
     datasource = DataSource()
     accounts = datasource.list_accounts()
     
     if not accounts:
-        print(colored("Nenhuma conta cadastrada!", "93"))
-        get_input("Pressione Enter para continuar...")
+        print(colored("No accounts registered!", "93"))
+        get_input("Press Enter to continue...")
         datasource.close()
         return
     
-    print(colored("=== CONTAS DISPONÍVEIS ===", "93"))
+    print(colored("=== AVAILABLE ACCOUNTS ===", "93"))
     print()
-    print(f"|{justify_cell('ID', 4)}|{justify_cell('NOME', 20)}|{justify_cell('EMAIL', 35)}|{justify_cell('ATIVA', 8)}|")
+    print(f"|{justify_cell('ID', 4)}|{justify_cell('NAME', 20)}|{justify_cell('EMAIL', 35)}|{justify_cell('ACTIVE', 8)}|")
     print("|" + "-" * 4 + "|" + "-" * 20 + "|" + "-" * 35 + "|" + "-" * 8 + "|")
     
     for id, name, email, ssh_key, active in accounts:
-        status = colored("SIM", "92") if active else colored("NÃO", "91")
+        status = "YES" if active else "NO"
         print(f"|{justify_cell(str(id), 4)}|{justify_cell(name, 20)}|{justify_cell(email, 35)}|{justify_cell(status, 8)}|")
     
     print()
     try:
-        account_id = get_input("ID da conta para ativar (ou Enter para voltar): ").strip()
+        account_id = get_input("Account ID to activate (or Enter to go back): ").strip()
         if account_id:
             account_id = int(account_id)
             if datasource.activate_account(account_id):
                 account = datasource.get_account_by_id(account_id)
                 if account:
                     _, name, email, _, _ = account
-                    print(colored(f"Conta '{name}' ativada com sucesso!", "92"))
-                    print(colored("Configurações Git e SSH aplicadas.", "92"))
+                    print(colored(f"Account '{name}' activated successfully!", "92"))
+                    print(colored("Git and SSH settings applied.", "92"))
             else:
-                print(colored("Erro ao ativar conta!", "91"))
-            get_input("Pressione Enter para continuar...")
+                print(colored("Error activating account!", "91"))
+            get_input("Press Enter to continue...")
     except (ValueError, KeyboardInterrupt):
         pass
     
     datasource.close()
 
 def show_current_account():
-    """Mostra informações da conta atual"""
+    """Show current account information"""
     datasource = DataSource()
     accounts = datasource.current_account()
     
-    print(colored("=== CONTA ATUAL ===", "93"))
+    print(colored("=== CURRENT ACCOUNT ===", "93"))
     print()
     
     if accounts:
         id, name, email, ssh_key, _ = accounts[0]
         print(f"ID: {colored(str(id), '96')}")
-        print(f"Nome: {colored(name, '96')}")
+        print(f"Name: {colored(name, '96')}")
         print(f"Email: {colored(email, '96')}")
-        print(f"Chave SSH: {colored(ssh_key, '96')}")
+        print(f"SSH Key: {colored(ssh_key, '96')}")
         
-        # Mostrar chave pública se disponível
         pub_key = datasource.get_public_key(ssh_key)
         if pub_key:
-            print(f"\nChave Pública:")
+            print(f"\nPublic Key:")
             print(colored(pub_key, '94'))
     else:
-        print(colored("Nenhuma conta ativa!", "93"))
+        print(colored("No active account!", "93"))
     
     print()
-    get_input("Pressione Enter para continuar...")
+    get_input("Press Enter to continue...")
     datasource.close()
 
 def remove_account():
-    """Remove conta"""
+    """Remove account"""
     datasource = DataSource()
     accounts = datasource.list_accounts()
     
     if not accounts:
-        print(colored("Nenhuma conta cadastrada!", "93"))
-        get_input("Pressione Enter para continuar...")
+        print(colored("No accounts registered!", "93"))
+        get_input("Press Enter to continue...")
         datasource.close()
         return
     
-    print(colored("=== REMOVER CONTA ===", "93"))
+    print(colored("=== REMOVE ACCOUNT ===", "93"))
     print()
-    print(f"|{justify_cell('ID', 4)}|{justify_cell('NOME', 20)}|{justify_cell('EMAIL', 35)}|")
+    print(f"|{justify_cell('ID', 4)}|{justify_cell('NAME', 20)}|{justify_cell('EMAIL', 35)}|")
     print("|" + "-" * 4 + "|" + "-" * 20 + "|" + "-" * 35 + "|")
     
     for id, name, email, _, _ in accounts:
@@ -215,79 +213,78 @@ def remove_account():
     
     print()
     try:
-        account_id = get_input("ID da conta para remover (ou Enter para cancelar): ").strip()
+        account_id = get_input("Account ID to remove (or Enter to cancel): ").strip()
         if account_id:
             account_id = int(account_id)
             account = datasource.get_account_by_id(account_id)
             if account:
                 _, name, _, _, _ = account
-                confirm = get_input(f"Confirma remoção da conta '{name}'? (s/N): ").strip().lower()
-                if confirm == 's':
+                confirm = get_input(f"Confirm removal of account '{name}'? (y/N): ").strip().lower()
+                if confirm == 'y':
                     if datasource.delete_account(account_id):
-                        print(colored(f"Conta '{name}' removida com sucesso!", "92"))
+                        print(colored(f"Account '{name}' removed successfully!", "92"))
                     else:
-                        print(colored("Erro ao remover conta!", "91"))
+                        print(colored("Error removing account!", "91"))
             else:
-                print(colored("Conta não encontrada!", "91"))
-            get_input("Pressione Enter para continuar...")
+                print(colored("Account not found!", "91"))
+            get_input("Press Enter to continue...")
     except (ValueError, KeyboardInterrupt):
         pass
     
     datasource.close()
 
 def test_git_connection():
-    """Testa conexão com GitHub"""
-    print(colored("=== TESTANDO CONEXÃO ===", "93"))
+    """Test GitHub connection"""
+    print(colored("=== TESTING CONNECTION ===", "93"))
     print()
     
     try:
         result = subprocess.run(['ssh', '-T', 'git@github.com'], 
                               capture_output=True, text=True, timeout=10)
         if "successfully authenticated" in result.stderr:
-            print(colored("✓ Conexão SSH com GitHub funcionando!", "92"))
+            print(colored("✓ SSH connection to GitHub working!", "92"))
         else:
-            print(colored("✗ Problema na conexão SSH com GitHub", "91"))
-            print(f"Saída: {result.stderr}")
+            print(colored("✗ SSH connection to GitHub failed", "91"))
+            print(f"Output: {result.stderr}")
     except subprocess.TimeoutExpired:
-        print(colored("✗ Timeout na conexão", "91"))
+        print(colored("✗ Connection timeout", "91"))
     except Exception as e:
-        print(colored(f"✗ Erro ao testar conexão: {e}", "91"))
+        print(colored(f"✗ Error testing connection: {e}", "91"))
     
     print()
-    get_input("Pressione Enter para continuar...")
+    get_input("Press Enter to continue...")
 
 def select_option(option):
-    """Processa opção selecionada"""
-    if option == 1:  # Adicionar login
+    """Process selected option"""
+    if option == 1:
         add_login()
-    elif option == 2:  # Fazer logon (ativar conta)
+    elif option == 2:
         os.system('clear')
         print_header()
         list_and_select_account()
-    elif option == 3:  # Listar contas
+    elif option == 3:
         os.system('clear')
         print_header()
         list_and_select_account()
-    elif option == 4:  # Ver conta atual
+    elif option == 4:
         os.system('clear')
         print_header()
         show_current_account()
-    elif option == 5:  # Remover conta
+    elif option == 5:
         os.system('clear')
         print_header()
         remove_account()
-    elif option == 6:  # Testar conexão
+    elif option == 6:
         os.system('clear')
         print_header()
         test_git_connection()
-    elif option == 7:  # Sair
+    elif option == 7:
         return True
     
     return False
 
 def main():
-    """Função principal"""
-    # Criar diretório se não existir
+    """Main function"""
     git_login_dir = Path.home() / '.git-login'
     if not git_login_dir.exists():
         git_login_dir.mkdir()
@@ -300,53 +297,49 @@ def main():
         os.system('clear')
         print_header()
         
-        # Mostrar conta atual
         datasource = DataSource()
         current_accounts = datasource.current_account()
         
         if current_accounts:
             _, name, email, _, _ = current_accounts[0]
-            print(colored(f"Conta Ativa: {name} ({email})", "95"))
+            print(colored(f"Active Account: {name} ({email})", "95"))
         else:
-            print(colored("Nenhuma conta ativa - Adicione uma nova conta!", "93"))
+            print(colored("No active account - Add a new one!", "93"))
         
         datasource.close()
         print()
 
-        # Processar entrada do usuário
         if key != 0:
             if key == '\r' or key == '\n':
                 should_exit = select_option(active)
 
-            if key == '\x1b[A':  # Seta para cima
+            if key == '\x1b[A':  # Up arrow
                 active = 7 if active == 1 else active - 1
-            elif key == '\x1b[B':  # Seta para baixo
+            elif key == '\x1b[B':  # Down arrow
                 active = 1 if active == 7 else active + 1
 
-        # Menu principal
         color = {"actived": "91", "unactived": "96"}
         
-        print("Escolha uma opção:")
-        print(colored((">>" if active == 1 else "__") + " [1] - Adicionar conta", color["actived"] if active == 1 else color["unactived"]))
-        print(colored((">>" if active == 2 else "__") + " [2] - Ativar conta", color["actived"] if active == 2 else color["unactived"]))
-        print(colored((">>" if active == 3 else "__") + " [3] - Listar contas", color["actived"] if active == 3 else color["unactived"]))
-        print(colored((">>" if active == 4 else "__") + " [4] - Ver conta atual", color["actived"] if active == 4 else color["unactived"]))
-        print(colored((">>" if active == 5 else "__") + " [5] - Remover conta", color["actived"] if active == 5 else color["unactived"]))
-        print(colored((">>" if active == 6 else "__") + " [6] - Testar conexão", color["actived"] if active == 6 else color["unactived"]))
-        print(colored((">>" if active == 7 else "__") + " [q] - Sair", color["actived"] if active == 7 else color["unactived"]))
+        print("Choose an option:")
+        print(colored((">>" if active == 1 else "__") + " [1] - Add account", color["actived"] if active == 1 else color["unactived"]))
+        print(colored((">>" if active == 2 else "__") + " [2] - Activate account", color["actived"] if active == 2 else color["unactived"]))
+        print(colored((">>" if active == 3 else "__") + " [3] - List accounts", color["actived"] if active == 3 else color["unactived"]))
+        print(colored((">>" if active == 4 else "__") + " [4] - View current account", color["actived"] if active == 4 else color["unactived"]))
+        print(colored((">>" if active == 5 else "__") + " [5] - Remove account", color["actived"] if active == 5 else color["unactived"]))
+        print(colored((">>" if active == 6 else "__") + " [6] - Test connection", color["actived"] if active == 6 else color["unactived"]))
+        print(colored((">>" if active == 7 else "__") + " [q] - Quit", color["actived"] if active == 7 else color["unactived"]))
 
-        # Capturar próxima tecla
         key = get_key()
         
         if key == 'q':
             should_exit = True
 
     print()
-    print(colored("Até logo! 👋", "92"))
+    print(colored("See you later! 👋", "92"))
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(colored("\n\nPrograma interrompido pelo usuário!", "93"))
+        print(colored("\n\nProgram interrupted by user!", "93"))
         sys.exit(0)

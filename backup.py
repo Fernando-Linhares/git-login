@@ -15,9 +15,9 @@ import argparse
 class GitLoginBackup:
     def __init__(self):
         self.home_dir = Path.home()
-        self.git_login_dir = self.home_dir / '.git-login'
+        self.git_login_dir = self.home_dir / '.git-hyper'
         self.ssh_dir = self.home_dir / '.ssh'
-        self.backup_dir = self.home_dir / '.git-login-backups'
+        self.backup_dir = self.home_dir / '.git-hyper-backups'
         
     def create_backup(self, backup_name=None):
         """Cria backup completo das configurações"""
@@ -29,7 +29,7 @@ class GitLoginBackup:
         # Nome do backup
         if not backup_name:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_name = f"git-login-backup-{timestamp}"
+            backup_name = f"git-hyper-backup-{timestamp}"
             
         # Criar diretório de backup
         self.backup_dir.mkdir(exist_ok=True)
@@ -39,19 +39,19 @@ class GitLoginBackup:
         
         try:
             with tarfile.open(backup_path, 'w:gz') as tar:
-                # Backup do diretório git-login
+                # Backup do diretório git-hyper
                 if self.git_login_dir.exists():
-                    tar.add(self.git_login_dir, arcname='git-login')
+                    tar.add(self.git_login_dir, arcname='git-hyper')
                     print("✓ Dados do Git Login Manager")
                 
                 # Backup das chaves SSH relacionadas
-                ssh_keys = list(self.ssh_dir.glob('git-login-*'))
+                ssh_keys = list(self.ssh_dir.glob('git-hyper-*'))
                 if ssh_keys:
                     for key_file in ssh_keys:
                         tar.add(key_file, arcname=f"ssh-keys/{key_file.name}")
                     print(f"✓ {len(ssh_keys)} chaves SSH")
                 
-                # Backup do config SSH (apenas se contém configuração git-login)
+                # Backup do config SSH (apenas se contém configuração git-hyper)
                 ssh_config = self.ssh_dir / 'config'
                 if ssh_config.exists():
                     with open(ssh_config, 'r') as f:
@@ -112,7 +112,7 @@ class GitLoginBackup:
             print("📁 Nenhum backup encontrado.")
             return []
         
-        backups = list(self.backup_dir.glob('git-login-backup-*.tar.gz'))
+        backups = list(self.backup_dir.glob('git-hyper-backup-*.tar.gz'))
         if not backups:
             print("📁 Nenhum backup encontrado.")
             return []
@@ -167,15 +167,15 @@ class GitLoginBackup:
                 print(f"✓ Backup atual salvo em: {current_backup}")
             
             with tarfile.open(backup_file, 'r:gz') as tar:
-                # Restaurar git-login directory
-                git_login_members = [m for m in tar.getmembers() if m.name.startswith('git-login/')]
+                # Restaurar git-hyper directory
+                git_login_members = [m for m in tar.getmembers() if m.name.startswith('git-hyper/')]
                 if git_login_members:
                     # Remover diretório atual se existir
                     if self.git_login_dir.exists():
                         shutil.rmtree(self.git_login_dir)
                     
                     for member in git_login_members:
-                        member.name = member.name.replace('git-login/', '.git-login/')
+                        member.name = member.name.replace('git-hyper/', '.git-hyper/')
                         tar.extract(member, self.home_dir)
                     print("✓ Dados do Git Login Manager restaurados")
                 
@@ -222,7 +222,7 @@ class GitLoginBackup:
                             print(f"   - {acc['name']} ({acc['email']}) {status}")
             
             print("✅ Restauração concluída com sucesso!")
-            print("💡 Execute 'git-login' para verificar as configurações.")
+            print("💡 Execute 'git-hyper' para verificar as configurações.")
             return True
             
         except Exception as e:
@@ -234,7 +234,7 @@ class GitLoginBackup:
         if not self.backup_dir.exists():
             return
         
-        backups = sorted(self.backup_dir.glob('git-login-backup-*.tar.gz'), 
+        backups = sorted(self.backup_dir.glob('git-hyper-backup-*.tar.gz'), 
                         key=lambda x: x.stat().st_mtime, reverse=True)
         
         if len(backups) <= keep_count:
