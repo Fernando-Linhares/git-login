@@ -2,7 +2,23 @@
 
 Sistema completo para gerenciar múltiplas contas Git/GitHub com chaves SSH, permitindo alternar entre diferentes identidades facilmente.
 
+### Uso
+
+[1/4] Tela inicial.
+
 ![alt text](static/overview.png)
+
+[2/4] Criação de chave ssh. Usando email e user name da conta github.
+
+![alt text](static/generate_ssh_key.png)
+
+[3/4] Adicionar a chave ssh às configurações do github.
+
+![alt text](static/add_github_ssh_key.png)
+
+[4/4] Testar conexão com github
+
+![alt text](static/test_connection.png)
 
 ## 🚀 Funcionalidades
 
